@@ -79,6 +79,61 @@ const pedidoController = {
     res.status(200).json(data[0]);
   },
 
+  // ACTUALIZACIÓN DE ESTADO DE PEDIDO
+  actualizarEstado: async (req, res) => {
+    const { id } = req.params;
+    const { nuevoEstado } = req.body;
+
+    // Verificar que el nuevo estado sea válido
+    if (!['solicitado', 'descargado', 'capturado'].includes(nuevoEstado)) {
+      return res.status(400).json({ error: 'Estado no válido' });
+    }
+
+    // Obtener el estado actual del pedido
+    const { data: pedidoActual, error: fetchError } = await pedidoModel.obtenerPorId(id);
+    if (fetchError) {
+      return res.status(404).json({ error: 'Pedido no encontrado.' });
+    }
+
+    // Verificar la transición de estado válida
+    if (
+      (pedidoActual.estado === 'solicitado' && nuevoEstado !== 'descargado') ||
+      (pedidoActual.estado === 'descargado' && nuevoEstado !== 'capturado') ||
+      pedidoActual.estado === 'capturado'
+    ) {
+      return res.status(400).json({ error: 'Transición de estado no permitida.' });
+    }
+
+    // Actualizar el estado del pedido
+    const { data, error } = await pedidoModel.actualizarEstado(id, nuevoEstado);
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(200).json(data[0]);
+  },
+
+  // CANCELACIÓN DE PEDIDO
+  cancelarPedido: async (req, res) => {
+    const { id } = req.params;
+
+    const { data, error } = await pedidoModel.cancelarPedido(id);
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(200).json({ message: 'Pedido cancelado exitosamente.', pedido: data[0] });
+  },
+
+  // REACTIVACIÓN DE PEDIDO
+  reactivarPedido: async (req, res) => {
+    const { id } = req.params;
+
+    const { data, error } = await pedidoModel.reactivarPedido(id);
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(200).json({ message: 'Pedido reactivado exitosamente.', pedido: data[0] });
+  },
+
   // ELIMINACIÓN DE PEDIDO
   // Maneja la eliminación de un pedido
   eliminar: async (req, res) => {
@@ -88,6 +143,17 @@ const pedidoController = {
       return res.status(400).json({ error: error.message });
     }
     res.status(200).json({ message: "Pedido eliminado exitosamente." });
+  },
+
+  // OBTENCIÓN DE PEDIDOS DE CLIENTES DE UN VENDEDOR
+  obtenerPedidosDeClientesDeVendedor: async (req, res) => {
+    const { vendedorId } = req.params;
+    try {
+      const pedidos = await pedidoModel.obtenerPedidosDeClientesDeVendedor(vendedorId);
+      res.status(200).json(pedidos);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   },
 };
 

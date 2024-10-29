@@ -1,5 +1,6 @@
 const express = require("express");
 const multer = require('multer');
+const cors = require('cors');
 require("dotenv").config();
 const usuarioRoutes = require('./routes/usuarioRoute');
 const pedidoRoutes = require('./routes/pedidoRoute');
@@ -7,6 +8,16 @@ const pedidoRoutes = require('./routes/pedidoRoute');
 // CONFIGURACIÓN DE LA APLICACIÓN EXPRESS
 const app = express();
 const port = process.env.PORT || 5000;
+
+// Configuración de CORS
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: process.env.CORS_METHODS ? process.env.CORS_METHODS.split(',') : ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: process.env.CORS_HEADERS ? process.env.CORS_HEADERS.split(',') : ['Content-Type', 'Authorization'],
+};
+
+// Aplicamos el middleware CORS
+app.use(cors(corsOptions));
 
 // Middleware para parsear JSON y datos de formulario
 app.use(express.json());
