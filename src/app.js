@@ -6,7 +6,8 @@ const pedidoRoutes = require('./routes/pedidoRoute');
 
 // CONFIGURACIÓN DE LA APLICACIÓN EXPRESS
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
+
 
 // Configuración de CORS
 const corsOptions = {
@@ -33,7 +34,7 @@ app.use('/pedidos', pedidoRoutes);
 
 // INICIO DEL SERVIDOR
 app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+  console.log(`Servidor corriendo en ${corsOptions.origin}:${port}`);
 });
 
 module.exports = app;
