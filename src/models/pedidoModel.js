@@ -106,22 +106,36 @@ const pedidoModel = {
   },
 
   // OBTENCIÓN DE PEDIDOS DE CLIENTES DE UN VENDEDOR
-  obtenerPedidosDeClientesDeVendedor: async (vendedorId) => {
-    const { data, error } = await supabase
-      .from('pedidos')
-      .select(`
-        *,
-        cliente:usuarios!pedidos_cliente_id_fkey(id, nombre, email),
-        vendedor_cliente:vendedores_clientes!inner(vendedor_id)
-      `)
-      .eq('vendedor_cliente.vendedor_id', vendedorId);
-      console.log(data);
-      
-    if (error) {
-      throw new Error('Error al obtener los pedidos: ' + error.message);
+  obtenerPedidosClientesVendedor: async (vendedorId) => {
+    // Primero, obtenemos los IDs de los clientes del vendedor
+    const { data: clientes, error: clientesError } = await supabase
+      .from("vendedores_clientes")
+      .select("cliente_id")
+      .eq("vendedor_id", vendedorId);
+
+    if (clientesError) {
+      return { data: null, error: clientesError };
     }
 
-    return data;
+    // Extraemos los IDs de los clientes
+    const clienteIds = clientes.map((c) => c.cliente_id);
+
+    // Ahora, obtenemos los pedidos de estos clientes
+    const { data, error } = await supabase
+      .from("pedidos")
+      .select(
+        `
+      *,
+      cliente:cliente_id (
+        id,
+        nombre,
+        email
+      )
+    `
+      )
+      .in("cliente_id", clienteIds);
+
+    return { data, error };
   },
 };
 

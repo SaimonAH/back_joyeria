@@ -1,5 +1,4 @@
 const express = require("express");
-const multer = require('multer');
 const cors = require('cors');
 require("dotenv").config();
 const usuarioRoutes = require('./routes/usuarioRoute');
@@ -22,10 +21,6 @@ app.use(cors(corsOptions));
 // Middleware para parsear JSON y datos de formulario
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Middleware para manejar form-data
-const upload = multer();
-app.use(upload.none()); // Para datos de formulario sin archivos
 
 // RUTA PRINCIPAL
 app.get('/', (req, res) => {

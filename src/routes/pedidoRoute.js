@@ -30,7 +30,7 @@ router.put("/:id/cancelar", verificarToken, pedidoController.cancelarPedido);
 // Ruta para reactivar un pedido (requiere autenticación)
 router.put("/:id/reactivar", verificarToken, pedidoController.reactivarPedido);
 
-// Ruta para obtener todos los pedidos de los clientes de un vendedor (requiere autenticación)
-router.get('/vendedor/:vendedorId', verificarToken, pedidoController.obtenerPedidosDeClientesDeVendedor);
+// Nueva ruta para obtener todos los pedidos de los clientes de un vendedor (requiere autenticación)
+router.get('/vendedor/:vendedorId', verificarToken, pedidoController.obtenerPedidosClientesVendedor);
 
 module.exports = router;

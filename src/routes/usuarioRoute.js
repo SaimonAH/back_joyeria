@@ -23,4 +23,7 @@ router.put('/:id', verificarToken, upload.single('imagen'), usuarioController.ac
 // Ruta para eliminar un usuario (requiere autenticación)
 router.delete('/:id', verificarToken, usuarioController.eliminar);
 
+// Ruta para obtener todos los clientes de un vendedor (requiere autenticación)
+router.get('/vendedor/:vendedorId/clientes', verificarToken, usuarioController.obtenerClientesDeVendedor);
+
 module.exports = router;

@@ -82,7 +82,7 @@ const pedidoController = {
   // ACTUALIZACIÓN DE ESTADO DE PEDIDO
   actualizarEstado: async (req, res) => {
     const { id } = req.params;
-    const { nuevoEstado } = req.body;
+    const { nuevoEstado, rol } = req.body;
 
     // Verificar que el nuevo estado sea válido
     if (!['solicitado', 'descargado', 'capturado'].includes(nuevoEstado)) {
@@ -96,12 +96,14 @@ const pedidoController = {
     }
 
     // Verificar la transición de estado válida
-    if (
-      (pedidoActual.estado === 'solicitado' && nuevoEstado !== 'descargado') ||
-      (pedidoActual.estado === 'descargado' && nuevoEstado !== 'capturado') ||
-      pedidoActual.estado === 'capturado'
-    ) {
-      return res.status(400).json({ error: 'Transición de estado no permitida.' });
+    if (!rol === "admin") {
+      if (
+        (pedidoActual.estado === 'solicitado' && nuevoEstado !== 'descargado') ||
+        (pedidoActual.estado === 'descargado' && nuevoEstado !== 'capturado') ||
+        pedidoActual.estado === 'capturado'
+      ) {
+        return res.status(400).json({ error: 'Transición de estado no permitida.' });
+      }
     }
 
     // Actualizar el estado del pedido
@@ -146,14 +148,14 @@ const pedidoController = {
   },
 
   // OBTENCIÓN DE PEDIDOS DE CLIENTES DE UN VENDEDOR
-  obtenerPedidosDeClientesDeVendedor: async (req, res) => {
+  obtenerPedidosClientesVendedor: async (req, res) => {
     const { vendedorId } = req.params;
-    try {
-      const pedidos = await pedidoModel.obtenerPedidosDeClientesDeVendedor(vendedorId);
-      res.status(200).json(pedidos);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+
+    const { data, error } = await pedidoModel.obtenerPedidosClientesVendedor(vendedorId);
+    if (error) {
+      return res.status(400).json({ error: error.message });
     }
+    res.status(200).json(data);
   },
 };
 
