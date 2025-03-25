@@ -19,7 +19,7 @@ const usuarioController = {
     const token = jwt.sign(
       { id: usuario.id, email: usuario.email, rol: usuario.rol },
       process.env.JWT_SECRET,
-      { expiresIn: '1w' }
+      { expiresIn: '12h' }
     );
 
     res.status(200).json({ token, usuario });
